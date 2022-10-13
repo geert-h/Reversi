@@ -19,40 +19,16 @@ namespace Reversi_IMP
         public partial class Reversi : Form
         {
             TextBox nTB;
-            int n = 6;
+            public int n = 6;
             int CellSize;
-            Point gridPoint = new Point(40, 340);
+            public Point gridPoint = new Point(40, 340);
             int xPos = 40; int yPos = 340;
             int move = 0;
             int Column = 0; int Row = 0;
             int[,] table;
             
 
-            Button StartButton = new Button();
-
-
-            void WriteLine()
-            {
-                if(move % 2 == 0)
-                {
-                    table[Column, Row] = 1;
-                }
-                else
-                {
-                    table[Column, Row] = 0;
-                }
-
-                for (int y = 0; y < n; y++)
-                {
-                    for (int x = 0; x < n; x++)
-                    {
-                        Console.Write(table[x, y]);
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
-            }
-            
+            Button StartButton = new Button();         
 
             public Reversi()
             {
@@ -67,6 +43,7 @@ namespace Reversi_IMP
                 Controls.Add(StartButton);
 
                 DoubleBuffered = true;
+                StartButton.Click += this.NnTB;
                 this.Paint += this.GridDraw;;
                 this.MouseClick += this.ClickMouse;
                 this.StartPosition = FormStartPosition.CenterScreen;
@@ -78,54 +55,83 @@ namespace Reversi_IMP
 
             void ClickMouse(object o, MouseEventArgs mea)
             {
-                move++;
-
-                if(mea.X > gridPoint.X && mea.X < gridPoint.X + 600 && mea.Y > gridPoint.Y && mea.Y < gridPoint.Y +600)
+                if(mea.X > gridPoint.X && mea.X < gridPoint.X + 600 && mea.Y > gridPoint.Y && mea.Y < gridPoint.Y + 600)
                 {
+                    move++;
                     double x = mea.X - gridPoint.X;
                     double y = mea.Y - gridPoint.Y;
 
                     Column = (int)(x / (600 / n));
                     Row = (int)(y / (600 / n));
 
+                    if (move % 2 == 0)
+                    {
+                        table[Column, Row] = 1;
+                    }
+                    else
+                    {
+                        table[Column, Row] = 0;
+                    }
 
-
-                    xPos = gridPoint.X + Column * 600 / n;
-                    yPos = gridPoint.Y + Row * 600 / n;
-
-                    Console.WriteLine($"X:{Column}, Y:{Row} XMouse:{mea.X}, YMouse: {mea.Y}");
-                    this.WriteLine();
                     this.Invalidate();
-                     
                 }
             }
             void LoadForm()
             {
                 table = new int[n, n];
                 for (int i = 0; i < n * n; i++) table[i % n, i / n] = -1;
+                Startpieces();
             }
             void NnTB(object o, EventArgs ea)
             {
                 n = Convert.ToInt32(nTB.Text);
+                if (n % 2 == 1)
+                {
+                    n++;
+                    nTB.Text = Convert.ToString(n);
+                    
+                }
+                table = new int[n, n];
+                for (int i = 0; i < n * n; i++) table[i % n, i / n] = -1;
+                Startpieces();
                 this.Invalidate();
             }
-
+            void Startpieces()
+            {
+                table[(n / 2) - 1, (n / 2) - 1] = 1;
+                table[(n / 2), (n / 2) - 1] = 0;
+                table[(n / 2) - 1, (n / 2)] = 0;
+                table[(n / 2), (n / 2)] = 1;
+            }
             void DrawPieces(object o, PaintEventArgs pea)
             {
-                Brush b;
-                int x = xPos;
-                int y = yPos;
+                //int x = xPos;
+                //int y = yPos;
                 int size = 600 / n - (600 / n) / 10;
                 int offset = ((600 / n) / 10) / 2;
-                if (move % 2 == 0)
+                Brush bR = new SolidBrush(Color.Red);
+                Brush bB = new SolidBrush(Color.Blue);
+                //pea.Graphics.FillEllipse(bR, x + offset, y + offset, size, size);
+
+                for (int y = 0; y< n; y++)
                 {
-                    b = new SolidBrush(Color.Red);
+                    for (int x = 0; x < n; x++)
+                    {
+                        Console.Write(table[x, y]);
+
+                        int xpos = gridPoint.X + x * 600 / n;
+                        int ypos = gridPoint.Y + y * 600 / n;
+                        switch (table[x, y])
+                        {
+                            case -1:break;
+                            case 0: pea.Graphics.FillEllipse(bR, xpos + offset, ypos + offset, size, size);
+                                break;
+                            case 1: pea.Graphics.FillEllipse(bB, xpos + offset, ypos + offset, size, size);
+                                break;
+                        }
+                    }
+                    Console.WriteLine();
                 }
-                else
-                {
-                    b = new SolidBrush(Color.Blue);
-                }
-                pea.Graphics.FillEllipse(b, x + offset, y + offset, size, size);
             }
         }
     }
