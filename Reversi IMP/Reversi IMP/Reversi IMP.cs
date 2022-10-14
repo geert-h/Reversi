@@ -22,8 +22,7 @@ namespace Reversi_IMP
             public Point gridPoint = new Point(40, 340);
             int move = 0;
             int Column = 0; int Row = 0;
-            int[,] table;
-            
+            CellState[,] table;
 
             Button StartButton = new Button();         
 
@@ -66,8 +65,8 @@ namespace Reversi_IMP
             }
             void LoadForm()
             {
-                table = new int[n, n];
-                for (int i = 0; i < n * n; i++) table[i % n, i / n] = -1;
+                table = new CellState[n, n];
+                for (int i = 0; i < n * n; i++) table[i % n, i / n] = CellState.None;
                 Startpieces();
             }
             void NnTB(object o, EventArgs ea)
@@ -79,17 +78,17 @@ namespace Reversi_IMP
                     nTB.Text = Convert.ToString(n);
                     
                 }
-                table = new int[n, n];
-                for (int i = 0; i < n * n; i++) table[i % n, i / n] = -1;
+                table = new CellState[n, n];
+                for (int i = 0; i < n * n; i++) table[i % n, i / n] = CellState.None;
                 Startpieces();
                 this.Invalidate();
             }
             void Startpieces()
             {
-                table[(n / 2) - 1, (n / 2) - 1] = 1;
-                table[(n / 2), (n / 2) - 1] = 0;
-                table[(n / 2) - 1, (n / 2)] = 0;
-                table[(n / 2), (n / 2)] = 1;
+                table[(n / 2) - 1, (n / 2) - 1] = CellState.Player2;
+                table[(n / 2), (n / 2) - 1] = CellState.Player1;
+                table[(n / 2) - 1, (n / 2)] = CellState.Player1;
+                table[(n / 2), (n / 2)] = CellState.Player2;
             }
             void DrawPieces(object o, PaintEventArgs pea)
             {
@@ -102,20 +101,20 @@ namespace Reversi_IMP
                 {
                     for (int x = 0; x < n; x++)
                     {
-                        Console.Write(table[x, y]);
+                        //Console.Write(table[x, y]);
 
                         int xpos = gridPoint.X + x * 600 / n;
                         int ypos = gridPoint.Y + y * 600 / n;
                         switch (table[x, y])
                         {
-                            case -1:break;
-                            case 0: pea.Graphics.FillEllipse(bR, xpos + offset, ypos + offset, size, size);
+                            case CellState.None:break;
+                            case CellState.Player1: pea.Graphics.FillEllipse(bR, xpos + offset, ypos + offset, size, size);
                                 break;
-                            case 1: pea.Graphics.FillEllipse(bB, xpos + offset, ypos + offset, size, size);
+                            case CellState.Player2: pea.Graphics.FillEllipse(bB, xpos + offset, ypos + offset, size, size);
                                 break;
                         }
                     }
-                    Console.WriteLine();
+                    //Console.WriteLine();
                 }
             }
         }
