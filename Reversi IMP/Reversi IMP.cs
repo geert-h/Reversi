@@ -17,12 +17,14 @@ namespace Reversi_IMP
         public partial class Reversi : Form
         {
             TextBox nTB;
+            Label moveLBL;
             public int n = 6;
             int CellSize;
             public Point gridPoint = new Point(40, 340);
             int move = 0;
             int Column = 0; int Row = 0;
             CellState[,] table;
+            CellValidity[,] ValidityTable;
 
             Button StartButton = new Button();         
 
@@ -32,6 +34,12 @@ namespace Reversi_IMP
                 nTB.Size = new Size(100, 20);
                 nTB.Location = new Point(20, 20);
                 Controls.Add(nTB);
+
+                moveLBL = new Label();
+                moveLBL.Size = new Size(100, 20);
+                moveLBL.Location = new Point(120, 20);
+                moveLBL.Text = $"{move % 2}"; 
+                Controls.Add(moveLBL);
 
                 StartButton.Size = new Size(100, 25);
                 StartButton.Location = new Point(20,65);
@@ -51,6 +59,7 @@ namespace Reversi_IMP
 
             void ClickMouse(object o, MouseEventArgs mea)
             {
+                moveLBL.Text = Convert.ToString(move % 2); 
                 if(mea.X > gridPoint.X && mea.X < gridPoint.X + 600 && mea.Y > gridPoint.Y && mea.Y < gridPoint.Y + 600)
                 {
                     double x = mea.X - gridPoint.X;
@@ -80,6 +89,7 @@ namespace Reversi_IMP
                 }
                 table = new CellState[n, n];
                 for (int i = 0; i < n * n; i++) table[i % n, i / n] = CellState.None;
+                move = 0;
                 Startpieces();
                 this.Invalidate();
             }
@@ -101,20 +111,20 @@ namespace Reversi_IMP
                 {
                     for (int x = 0; x < n; x++)
                     {
-                        //Console.Write(table[x, y]);
-
                         int xpos = gridPoint.X + x * 600 / n;
                         int ypos = gridPoint.Y + y * 600 / n;
                         switch (table[x, y])
                         {
-                            case CellState.None:break;
+                            case CellState.None:
+                                break;
                             case CellState.Player1: pea.Graphics.FillEllipse(bR, xpos + offset, ypos + offset, size, size);
                                 break;
                             case CellState.Player2: pea.Graphics.FillEllipse(bB, xpos + offset, ypos + offset, size, size);
                                 break;
+                            case CellState.Available: pea.Graphics.DrawEllipse(Pens.Black, xpos + offset, ypos + offset, size, size);
+                                break;
                         }
                     }
-                    //Console.WriteLine();
                 }
             }
         }

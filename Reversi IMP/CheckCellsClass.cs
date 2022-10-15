@@ -1,4 +1,5 @@
 ﻿using System;
+using System.DirectoryServices.ActiveDirectory;
 using System.Windows.Forms;
 
 namespace Reversi_IMP
@@ -9,70 +10,110 @@ namespace Reversi_IMP
         {
             void CheckCells()
             {
-                if (CheckNeighbour() == true)
+                if (CheckBoardValidity() == true)
                 {
-                    if (table[Row, Column] == CellState.None)
+                    NeighbourCheck();
+                };
+            }
+
+            bool CheckBoardValidity()
+            {
+                for (int y = -1; y < 2; y++)
+                {
+                    for (int x = -1; x < 2; x++)
                     {
-                        switch (move % 2)
+                        if(Row + x > 0 && Row + x < n && Column + y > 0 && Column + y < n)
                         {
-                            case 0:
-                                Check(CellState.Player1);
-                                break;
-                            case 1:
-                                Check(CellState.Player2);
-                                break;
+                            if ((table[Row + x, Column + y] == CellState.Player1 || table[Row + x, Column + y] == CellState.Player2))
+                                return true;
                         }
                     }
                 }
+                return false;
             }
-            void Check(CellState i)
+
+            void NeighbourCheck()
             {
-                switch (CheckCorner())
+                switch(move % 2)
                 {
-                    case -1: //niet in een hoek
-                        Console.WriteLine("Niet in een hoek");
-                        Console.WriteLine($"n: {n} Row: {Row} Column: {Column}");
+                    case 0:
+                        //if (table[Column + x, Row + y] == CellState.Player2)
+                        //{
+                            if (ValidMoveCheck(CellState.Player1, CellState.Player2) == true)
+                            {
+                                table[Column, Row] = CellState.Player1;
+                                move++;
+                            }
+                            
+                        //}
                         break;
-                    case 1: //linksboven
-                        Console.WriteLine("LinksBoven");
-                        break;
-                    case 2: //Linksonder
-                        Console.WriteLine("LinksOnder");
-                        break;
-                    case 3: //Rechtsboven
-                        Console.WriteLine("RechtsBoven");
-                        break;
-                    case 4: //Rechtsonder
-                        Console.WriteLine("RechtsOnder");
+                    case 1:
+                        //if (table[Row + x, Column + y] == CellState.Player1)
+                        //{
+                            if (ValidMoveCheck(CellState.Player2, CellState.Player1) == true)
+                            {
+                                table[Column, Row] = CellState.Player2;
+                                move++;
+                            }
+                        //}
                         break;
                 }
-                table[Column, Row] = i;
-                move++;
             }
-            int CheckCorner()
+
+            bool ValidMoveCheck(CellState player, CellState player2)
             {
-                if (Column == 0 && Row == 0)
-                    return 1;
-                else if (Column == 0 && Row == n - 1)
-                    return 2;
-                else if (Column == n - 1 && Row == 0)
-                    return 3;
-                else if (Column == n - 1 && Row == n - 1)
-                    return 4;
-                else return -1;
-            }
-            bool CheckNeighbour()
-            {
-                for (int y= -1; y <=3 ; y++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    for (int x = -1; x <= 3; x++)
+                    for (int x = -1; x <= 1; x++)
                     {
-                        if (table[Row+x,Column+y] != CellState.None && table[Row+x,Column+y] != table[Row, Column])
+                        if (x != 0 || y != 0)
                         {
-                            return true;
+                            if (Check(player, player2, x, y) == true)
+                                return true;
                         }
                     }
                 }
+                
+                bool Check(CellState player, CellState player2, int x, int y)
+                {
+                    int Xplayer1 = 0; int Yplayer1 = 0;
+                    int Xplayer2 = 0; int Yplayer2 = 0;
+                    int Xnone = 0; int Ynone = 0;
+
+                    for(int i = 0; Row + x * i < n && Row + x * i >= 0; i++)
+                    {
+                        for (int j = 0; Column + y * j < n && Column + y * j >= 0; j++)
+                        {
+                            if (table[Row + x * i, Column + y * j] == player2)
+                            {
+                                Xplayer2 = Math.Abs(x * i); Yplayer2 = Math.Abs(y * j);
+                            }
+                            else if (table[Row + x * i, Column + y * j] == player)
+                            {
+                                Xplayer1 = Math.Abs(x * i); Yplayer1 = Math.Abs(y * j);
+                            }
+                            else if (table[Row + x * i, Column + y * j] == CellState.None)
+                            {
+                                Xnone = Math.Abs(x * i); Ynone = Math.Abs(y * j);
+                            }
+                            if (y == 0)
+                                break;
+                        }
+                        if (x == 0)
+                            break;
+                    }
+                    if (Xplayer1 != 0 || Yplayer1 != 0)
+                    {
+                            if ((Xplayer1 <= Xplayer2) && (Yplayer1 <= Yplayer2))
+                            {
+                                Console.WriteLine($"RIJ: {Row}, KOLOM: {Column}");
+                                return true;
+                            }
+                    }
+                    Console.WriteLine($"1({Xplayer1}, {Yplayer1}), 2({Xplayer2}, {Yplayer2})");
+                    return false;
+                }
+                Console.WriteLine();
                 return false;
             }
         }

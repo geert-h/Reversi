@@ -7,4 +7,10 @@
         Player2,
         Available
     }
+    enum CellValidity
+    {
+        Self,
+        Valid,
+        Invalid
+    }
 }
