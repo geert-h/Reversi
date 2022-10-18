@@ -87,6 +87,7 @@ namespace Reversi_IMP
         void NnTB(object o, EventArgs ea)
         {
             n = Convert.ToInt32(nTB.Text);
+            move = 0;
             if (n % 2 == 1)
             {
                 n++;

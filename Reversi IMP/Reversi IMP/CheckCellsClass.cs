@@ -73,7 +73,7 @@ namespace Reversi_IMP
                 int Xplayer1 = 0; int Yplayer1 = 0;
                 int Xplayer2 = 0; int Yplayer2 = 0;
                 int Xnone = 0; int Ynone = 0;
-                bool player1Cell = false; bool player2Cell = false;
+                bool player1Cell = false;
 
                 if (Math.Abs(x) == Math.Abs(y))
                 {
@@ -164,10 +164,11 @@ namespace Reversi_IMP
                         {
                             for (int k = 0; Column + y * j - k != Column; k++)
                             {
-                                Console.WriteLine(Row + x * i - k);
+                                Console.WriteLine($"x==0: {Column + y * i - k} Kolom: {Column}, y: {y}, j: {j}, k: {k}");
                                 if (table[Row, Column + y * j - k] == player2)
                                 {
                                     table[Row, Column + y * j - k] = player1;
+                                    Console.WriteLine("Succes");
                                 }
                             }
                         }
@@ -175,10 +176,11 @@ namespace Reversi_IMP
                         {
                             for (int l = 0; Row + x * i - l != Row; l++)
                             {
-                            Console.WriteLine(Row + x * i - l);
+                                Console.WriteLine($"y==0: {Row + x * i - l} Rij: {Row}, x: {x}, i: {i}, l: {l}");
                                 if (table[Row + x * i - l, Column] == player2)
                                 {
                                     table[Row + x * i - l, Column] = player1;
+                                    Console.WriteLine("Succes");
                                 }
                             }
                         }
