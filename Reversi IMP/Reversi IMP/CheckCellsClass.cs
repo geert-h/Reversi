@@ -1,193 +1,65 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Reversi_IMP
 {
-        public partial class Reversi : Form
+    public partial class Reversi : Form
+    {
+        public void CheckPossibleCells()
         {
-        void CheckCells()
-        {
-            if (table[Row, Column] == CellState.None)
+            for (int yCell = 0; yCell < n; yCell++)
             {
-                if (CheckBoardValidity() == true)
+                for (int xCell = 0; xCell < n; xCell++)
                 {
-                    NeighbourCheck();
-                }
-            }
-        }
+                    CellState currentPlayer = CellState.None;
+                    CellState otherPlayer = CellState.None;
+                    (int x, int y, CellState state)[] DirectionArray = null;
 
-        bool CheckBoardValidity()
-        {
-            for (int y = -1; y < 2; y++)
-            {
-                for (int x = -1; x < 2; x++)
-                {
-                    if (Row + x > 0 && Row + x < n && Column + y > 0 && Column + y < n)
+                    switch (move % 2)
                     {
-                        if ((table[Row + x, Column + y] == CellState.Player1 || table[Row + x, Column + y] == CellState.Player2))
-                            return true;
-                    }
-                }
-            }
-            return false;
-        }
+                        case 0:
+                            currentPlayer = CellState.Player1;
+                            otherPlayer = CellState.Player2;
+                            DirectionArray = GetCellStatesInDirection(CellState.Player1, CellState.Player2);
+                            break;
 
-        void NeighbourCheck()
-        {
-            switch (move % 2)
-            {
-                case 0:
-                    if (ValidMoveCheck(CellState.Player1, CellState.Player2) == true)
-                    {
-                        table[Row, Column] = CellState.Player1;
-                        
-                        move++;
-                    }
-                    break;
-                case 1:
-                    if (ValidMoveCheck(CellState.Player2, CellState.Player1) == true)
-                    {
-                        table[Row, Column] = CellState.Player2;
-                        move++;
-                    }
-                    break;
-            }
-        }
-
-        bool ValidMoveCheck(CellState player1, CellState player2)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                for (int x = -1; x <= 1; x++)
-                {
-                    if (x != 0 || y != 0)
-                    {
-                        if (Check(player1, player2, x, y) == true)
-                            return true;
-                    }
-                }
-            }
-
-            bool Check(CellState player1, CellState player2, int x, int y)
-            {
-                int Xplayer1 = 0; int Yplayer1 = 0;
-                int Xplayer2 = 0; int Yplayer2 = 0;
-                int Xnone = 0; int Ynone = 0;
-                bool player1Cell = false;
-
-                if (Math.Abs(x) == Math.Abs(y))
-                {
-                    DiagonalCheck();
-                }
-                else
-                    StraightCheck();
-
-                Console.WriteLine($"P1: ({Xplayer1}, {Yplayer1}), P2: ({Xplayer2}, {Yplayer2}) V: {(Xplayer1 != 0 || Yplayer1 != 0) && (Xplayer2 != 0 || Yplayer2 != 0)}");
-
-                if ((Xplayer1 != 0 || Yplayer1 != 0) && (Xplayer2 != 0 || Yplayer2 != 0))
-                {
-                    if ((Xplayer2 <= Xplayer1) && (Yplayer2 <= Yplayer1))
-                    {
-                        Console.WriteLine($"RIJ: {Row}, KOLOM: {Column}, x: {x}, y: {y}");
-                        return true;
-                    }
-                }
-                return false;
-
-                void StraightCheck()
-                {
-                    for (int i = 0; Row + x * i < n && Row + x * i >= 0; i++)
-                    {
-                        for (int j = 0; Column + y * j < n && Column + y * j >= 0; j++)
-                        {
-                            CheckCheck(i, j);
-                            if (y == 0)
-                                break;
-                        }
-                        if (x == 0)
+                        case 1:
+                            currentPlayer = CellState.Player2;
+                            otherPlayer = CellState.Player1;
+                            DirectionArray = GetCellStatesInDirection(CellState.Player2, CellState.Player1);
                             break;
                     }
-                }
-                void DiagonalCheck()
-                {
-                    for (int i = 0; Row + x * i < n && Row + x * i >= 0 && Column + y * i < n && Column + y * i >= 0; i++)
-                    {
-                        CheckCheck(i, i);
-                    }
 
-                }
+                    foreach ((int x, int y) in CheckNeigbours(otherPlayer))
+                    {
+                        int xDistanceCurrentPlayer = 0, yDistanceCurrentPlayer = 0;
+                        Console.WriteLine($"x: {x}, y: {y}");
 
-                void CheckCheck(int i, int j)
-                {
-                    if (table[Row + x * i, Column + y * j] == player2)
-                    {
-                        Xplayer2 = Math.Abs(x * i); Yplayer2 = Math.Abs(y * j);
-                        //Console.Write($"x2: {Xplayer2}, y2: {Yplayer2}");
-                    }
-                    else if (table[Row + x * i, Column + y * j] == player1)
-                    {
-                        if (player1Cell == false)
+                        for (int i = 1; xCell + x * i >= 0 && xCell + x * i < n && yCell + y * i >= 0 && yCell + y * i < n; i++)
                         {
-                            Xplayer1 = Math.Abs(x * i); Yplayer1 = Math.Abs(y * j);
-                            player1Cell = true;
-                        }
-
-                        //Console.Write($"(x1: {Xplayer1}, y1; {Yplayer1})");
-                    }
-                    else if (table[Row + x * i, Column + y * j] == CellState.None)
-                    {
-                        Xnone = Math.Abs(x * i); Ynone = Math.Abs(y * j);
-                        //Console.Write(table[Row + x * i, Column + y * j]);
-                    }
-
-                    if (Xplayer1 != 0 || Yplayer1 != 0)
-                    {
-                        FlipPieces(i, j);
-                    }
-                }
-                void FlipPieces(int i, int j)
-                {
-                    if (player1Cell == true)
-                    {
-                        if (Math.Abs(x) == Math.Abs(y))
-                        {
-                            for (int k = 0; table[Row + x * i - k, Column + y * j - k] != table[Row, Column]; k++)
+                            if (table[xCell + x * i, yCell + y * i] == currentPlayer)
                             {
-                                Console.WriteLine($"{Row + x * i - k}, {Column + y * j - k}");
-                                if (table[Row + x * i - k, Column + y * j - k] == player2)
-                                {
-                                    table[Row + x * i - k, Column + y * j - k] = player1;
-                                }
+                                xDistanceCurrentPlayer = Math.Abs(x * i);
+                                yDistanceCurrentPlayer = Math.Abs(y * i);
                             }
-                        }
-                        if (x == 0)
+                        };
+                        if (xDistanceCurrentPlayer != 0 || yDistanceCurrentPlayer != 0)
                         {
-                            for (int k = 0; Column + y * j - k != Column; k++)
+                            for (int i = 1; xCell + x * i >= 0 && xCell + x * i < n && yCell + y * i >= 0 && yCell + y * i < n; i++)
                             {
-                                Console.WriteLine($"x==0: {Column + y * i - k} Kolom: {Column}, y: {y}, j: {j}, k: {k}");
-                                if (table[Row, Column + y * j - k] == player2)
+                                if (table[xCell + x * i, yCell + y * i] == otherPlayer && (xDistanceCurrentPlayer > Math.Abs(x * i) || yDistanceCurrentPlayer > Math.Abs(y * i)))
                                 {
-                                    table[Row, Column + y * j - k] = player1;
-                                    Console.WriteLine("Succes");
-                                }
-                            }
-                        }
-                        if (y == 0)
-                        {
-                            for (int l = 0; Row + x * i - l != Row; l++)
-                            {
-                                Console.WriteLine($"y==0: {Row + x * i - l} Rij: {Row}, x: {x}, i: {i}, l: {l}");
-                                if (table[Row + x * i - l, Column] == player2)
-                                {
-                                    table[Row + x * i - l, Column] = player1;
-                                    Console.WriteLine("Succes");
+                                    table[xCell, yCell] = CellState.Available;
                                 }
                             }
                         }
                     }
                 }
             }
-            return false;
         }
     }
 }
