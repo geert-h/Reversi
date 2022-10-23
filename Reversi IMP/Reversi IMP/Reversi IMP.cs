@@ -8,44 +8,70 @@ namespace Reversi_IMP
     {
         public static void Main()
         {
-            Reversi r = new Reversi();
-            r.Text = "Reversi";
-            r.ClientSize = new Size(680, 980);
-            Application.Run(r);
+            Reversi reversi = new Reversi();
+            reversi.Text = "Reversi";
+            reversi.ClientSize = new Size(680, 980);
+            Application.Run(reversi);
         }
 
         TextBox nTB;
         Label moveLBL;
         public int n = 6;
-        int CellSize;
         public Point gridPoint = new Point(40, 340);
         int move = 0;
         int Column = 0; int Row = 0;
+        bool help = false;
         CellState[,] table;
 
-        Button StartButton = new Button();         
+        void MakeButton(Button button, Size size, Point point, string text, bool validity)
+        {
+            button.Size = size;
+            button.Location = point;
+            button.Text = text;
+            Controls.Add(button);
+
+            if (validity)
+                button.Show();
+            else button.Hide();
+        }
+        void MakeTextBox(TextBox textbox, Size size, Point point, string text, bool validity)
+        {
+            textbox.Size = size;
+            textbox.Location = point;
+            textbox.Text = text;
+            Controls.Add(textbox);
+            if(validity)
+                textbox.Show();
+            else textbox.Hide();
+        }
+        void MakeLabel(Label label, Size size, Point point, string text, bool validity)
+        {
+            label.Size = size;
+            label.Location = point;
+            label.Text = text;
+            Controls.Add(label);
+            if(validity)
+                label.Show();
+            else label.Hide();
+        }
 
         public Reversi()
         {
+            Button StartButton = new Button();
+            MakeButton(StartButton, new Size(100,25), new Point(20, 65), "Start", true);
+            StartButton.Click += this.NnTB;
+
+            Button HelpButton = new Button();
+            MakeButton(HelpButton, new Size(100, 25), new Point(20, 95), "Help", true);
+            HelpButton.Click += this.HButton;
+
             nTB = new TextBox();
-            nTB.Size = new Size(100, 20);
-            nTB.Location = new Point(20, 20);
-            nTB.Text = "6";
-            Controls.Add(nTB);
+            MakeTextBox(nTB, new Size(100, 20), new Point(20, 20), "6", true);
 
             moveLBL = new Label();
-            moveLBL.Size = new Size(100, 20);
-            moveLBL.Location = new Point(120, 20);
-            nTB.Text = "6";
-            Controls.Add(moveLBL);
-
-            StartButton.Size = new Size(100, 25);
-            StartButton.Location = new Point(20,65);
-            StartButton.Text = "Start";
-            Controls.Add(StartButton);
+            MakeLabel(moveLBL, new Size(150, 20), new Point(120, 20), "Speler 1 is aan zet.", true);
 
             DoubleBuffered = true;
-            StartButton.Click += this.NnTB;
             this.Paint += this.GridDraw;;
             this.MouseClick += this.ClickMouse;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -59,24 +85,24 @@ namespace Reversi_IMP
         {
             switch(move % 2)
             {
-                case 0: moveLBL.Text = Convert.ToString(CellState.Player1);
+                case 0: moveLBL.Text = "Speler 1 is aan zet.";
                     break;
-                case 1: moveLBL.Text = Convert.ToString(CellState.Player2);
+                case 1: moveLBL.Text = "Speler 2 is aan zet.";
                     break;
             }
 
-            if(mea.X > gridPoint.X && mea.X < gridPoint.X + 600 && mea.Y > gridPoint.Y && mea.Y < gridPoint.Y + 600)
+            if(mea.X > gridPoint.X && 
+               mea.X < gridPoint.X + 600 &&
+               mea.Y > gridPoint.Y &&
+               mea.Y < gridPoint.Y + 600)
             {
-                double x = mea.X - gridPoint.X;
-                double y = mea.Y - gridPoint.Y;
+                int x = mea.X - gridPoint.X;
+                int y = mea.Y - gridPoint.Y;
 
-                Column = (int)(y / (600 / n));
-                Row = (int)(x / (600 / n));
+                Column = y / (600 / n);
+                Row = x / (600 / n);
 
                 CheckCells();
-
-                //var check = new CheckBoard();
-                //check.BoardCheck(table, Row, Column, n, ref move);
 
                 this.Invalidate();
             }
@@ -84,10 +110,13 @@ namespace Reversi_IMP
         void LoadForm()
         {
             table = new CellState[n, n];
-            for (int i = 0; i < n * n; i++) table[i % n, i / n] = CellState.None;
+            for (int i = 0; i < n * n; i++) 
+                table[i % n, i / n] = CellState.None;
+
             Startpieces();
             CheckPossibleCells();
         }
+
         void NnTB(object o, EventArgs ea)
         {
             n = Convert.ToInt32(nTB.Text);
@@ -101,6 +130,14 @@ namespace Reversi_IMP
             table = new CellState[n, n];
             for (int i = 0; i < n * n; i++) table[i % n, i / n] = CellState.None;
             Startpieces();
+            CheckPossibleCells();
+
+            this.Invalidate();
+        }
+        void HButton(object o, EventArgs ea)
+        {
+            if (!help) help = true;
+            else help = false;
             this.Invalidate();
         }
         void Startpieces()
@@ -121,7 +158,6 @@ namespace Reversi_IMP
             {
                 for (int x = 0; x < n; x++)
                 {
-                    //Console.Write(table[x, y]);
 
                     int xpos = gridPoint.X + x * 600 / n;
                     int ypos = gridPoint.Y + y * 600 / n;
@@ -132,13 +168,11 @@ namespace Reversi_IMP
                             break;
                         case CellState.Player2: pea.Graphics.FillEllipse(bB, xpos + offset, ypos + offset, size, size);
                             break;
-                        case CellState.Available: pea.Graphics.DrawEllipse(Pens.Black, xpos + offset + size / 4, ypos + offset + size / 4, size / 2, size / 2);
+                        case CellState.Available: if(help) pea.Graphics.DrawEllipse(Pens.Black, xpos + offset + size / 4, ypos + offset + size / 4, size / 2, size / 2);
                             break;
                     }
                 }
-                //Console.WriteLine();
             }
-            //Console.WriteLine();
         }
     }
 }

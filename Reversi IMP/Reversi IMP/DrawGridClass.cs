@@ -5,6 +5,8 @@ namespace Reversi_IMP
 {
     public partial class Reversi : Form
     {
+        int CellSize;
+
         void GridDraw(object o, PaintEventArgs pea)
         {
             SolidBrush BackgroundBrush = new SolidBrush(Color.FromArgb(64, 128, 0));
