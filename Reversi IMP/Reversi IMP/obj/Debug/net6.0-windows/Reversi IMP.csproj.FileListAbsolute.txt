@@ -28,3 +28,5 @@ C:\Users\Geert\Source\Repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-win
 C:\Users\Geert\Source\Repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-windows\Reversi IMP.pdb
 C:\Users\Geert\Source\Repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-windows\Reversi IMP.genruntimeconfig.cache
 C:\Users\Geert\Source\Repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-windows\ref\Reversi IMP.dll
+C:\Users\geert\source\repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-windows\Reversi_IMP.Reversi.resources
+C:\Users\geert\source\repos\Reversi\Reversi IMP\Reversi IMP\obj\Debug\net6.0-windows\Reversi IMP.csproj.GenerateResource.cache

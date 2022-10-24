@@ -8,19 +8,24 @@
     "net6.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Geert\\.nuget\\packages\\": {}
+    "C:\\Users\\geert\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\Reversi IMP.csproj",
+      "projectUniqueName": "C:\\Users\\geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\Reversi IMP.csproj",
       "projectName": "Reversi IMP",
-      "projectPath": "C:\\Users\\Geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\Reversi IMP.csproj",
-      "packagesPath": "C:\\Users\\Geert\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\obj\\",
+      "projectPath": "C:\\Users\\geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\Reversi IMP.csproj",
+      "packagesPath": "C:\\Users\\geert\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\geert\\Source\\Repos\\Reversi\\Reversi IMP\\Reversi IMP\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Geert\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\geert\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -64,7 +69,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
       }
     }
   }

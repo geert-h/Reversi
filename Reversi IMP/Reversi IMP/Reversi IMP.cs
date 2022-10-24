@@ -6,6 +6,9 @@ namespace Reversi_IMP
 {
     public partial class Reversi : Form
     {
+        Button StartButton = new Button(); Button HelpButton = new Button(); Button AvailabilityButton = new Button();
+
+        Label AvailabilityBackgroundLabel = new Label(); Label AvailabilityInfoLabel = new Label();
         public static void Main()
         {
             Reversi reversi = new Reversi();
@@ -14,8 +17,8 @@ namespace Reversi_IMP
             Application.Run(reversi);
         }
 
-        TextBox nTB;
-        Label moveLBL;
+        TextBox nTB = new TextBox();
+        Label moveLBL = new Label();
         public int n = 6;
         public Point gridPoint = new Point(40, 340);
         int move = 0;
@@ -23,53 +26,58 @@ namespace Reversi_IMP
         bool help = false;
         CellState[,] table;
 
-        void MakeButton(Button button, Size size, Point point, string text, bool validity)
+        void MakeButton(Button button, Size size, Point point, string text, bool show)
         {
             button.Size = size;
             button.Location = point;
             button.Text = text;
             Controls.Add(button);
-
-            if (validity)
+            if (show)
                 button.Show();
             else button.Hide();
         }
-        void MakeTextBox(TextBox textbox, Size size, Point point, string text, bool validity)
+        void MakeTextBox(TextBox textbox, Size size, Point point, string text, bool show)
         {
             textbox.Size = size;
             textbox.Location = point;
             textbox.Text = text;
             Controls.Add(textbox);
-            if(validity)
+            if (show)
                 textbox.Show();
             else textbox.Hide();
         }
-        void MakeLabel(Label label, Size size, Point point, string text, bool validity)
+        void MakeLabel(Label label, Size size, Point point, string text, bool show)
         {
             label.Size = size;
             label.Location = point;
             label.Text = text;
+            label.BackColor = Color.DarkSlateGray;
             Controls.Add(label);
-            if(validity)
+            if (show)
                 label.Show();
             else label.Hide();
         }
 
         public Reversi()
         {
-            Button StartButton = new Button();
+            
             MakeButton(StartButton, new Size(100,25), new Point(20, 65), "Start", true);
             StartButton.Click += this.NnTB;
 
-            Button HelpButton = new Button();
             MakeButton(HelpButton, new Size(100, 25), new Point(20, 95), "Help", true);
             HelpButton.Click += this.HButton;
 
-            nTB = new TextBox();
             MakeTextBox(nTB, new Size(100, 20), new Point(20, 20), "6", true);
 
-            moveLBL = new Label();
             MakeLabel(moveLBL, new Size(150, 20), new Point(120, 20), "Speler 1 is aan zet.", true);
+
+            //NoAvailablePopUp
+            MakeButton(AvailabilityButton, new Size(100, 25), new Point(260, 395), "OK", false);
+            AvailabilityButton.Click += this.Availability;
+
+            MakeLabel(AvailabilityBackgroundLabel, new Size(200, 200), new Point(240, 240), "", false);
+
+            MakeLabel(AvailabilityInfoLabel, new Size(80, 20), new Point(260, 260), "", false);
 
             DoubleBuffered = true;
             this.Paint += this.GridDraw;;
@@ -83,7 +91,7 @@ namespace Reversi_IMP
 
         void ClickMouse(object o, MouseEventArgs mea)
         {
-            switch(move % 2)
+            switch (move % 2)
             {
                 case 0: moveLBL.Text = "Speler 1 is aan zet.";
                     break;
@@ -103,9 +111,18 @@ namespace Reversi_IMP
                 Row = x / (600 / n);
 
                 CheckCells();
+                CheckGameState();
 
                 this.Invalidate();
             }
+        }
+        
+        void Availability(object o, EventArgs ea)
+        {
+            move++;
+            AvailabilityButton.Hide();
+            AvailabilityBackgroundLabel.Hide();
+            this.Invalidate();
         }
         void LoadForm()
         {

@@ -8,21 +8,7 @@ namespace Reversi_IMP
         public void CheckPossibleCells()
         {
 
-            CellState currentPlayer = CellState.None;
-            CellState otherPlayer = CellState.None;
-
-            switch (move % 2)
-            {
-                case 0:
-                    currentPlayer = CellState.Player1;
-                    otherPlayer = CellState.Player2;
-                    break;
-
-                case 1:
-                    currentPlayer = CellState.Player2;
-                    otherPlayer = CellState.Player1;
-                    break;
-            }
+            (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
 
             for (int yCell = 0; yCell < n; yCell++)
             {
@@ -35,14 +21,20 @@ namespace Reversi_IMP
                         int xDistanceCurrentPlayer = 0, yDistanceCurrentPlayer = 0;
                         int xFirstEmptyCell = 0; int yFirstEmptyCell = 0;
 
-                        for (int i = 1; xCell + x * i >= 0 && xCell + x * i < n && yCell + y * i >= 0 && yCell + y * i < n; i++)
+                        for (int i = 1; xCell + x * i >= 0 &&
+                            xCell + x * i < n &&
+                            yCell + y * i >= 0 &&
+                            yCell + y * i < n; i++)
                         {
                             if (table[xCell + x * i, yCell + y * i] == currentPlayer)
                             {
                                 xDistanceCurrentPlayer = Math.Abs(x * i);
                                 yDistanceCurrentPlayer = Math.Abs(y * i);
                             }
-                            if ((table[xCell + x * i, yCell + y * i] == CellState.None || table[xCell + x * i, yCell + y * i] == CellState.Available) && xFirstEmptyCell == 0 && yFirstEmptyCell == 0)
+                            if ((table[xCell + x * i, yCell + y * i] == CellState.None ||
+                                table[xCell + x * i, yCell + y * i] == CellState.Available) &&
+                                xFirstEmptyCell == 0 &&
+                                yFirstEmptyCell == 0)
                             {
                                 xFirstEmptyCell = Math.Abs(x * i);
                                 yFirstEmptyCell = Math.Abs(y * i);
@@ -53,7 +45,11 @@ namespace Reversi_IMP
 
                         for (int i = 1; xCell + x * i >= 0 && xCell + x * i < n && yCell + y * i >= 0 && yCell + y * i < n; i++)
                         {
-                            if (table[xCell + x * i, yCell + y * i] == otherPlayer && (xFirstEmptyCell > xDistanceCurrentPlayer || yFirstEmptyCell > yDistanceCurrentPlayer) && (xDistanceCurrentPlayer > Math.Abs(x * i) || yDistanceCurrentPlayer > Math.Abs(y * i)))
+                            if (table[xCell + x * i, yCell + y * i] == otherPlayer && 
+                               (xFirstEmptyCell > xDistanceCurrentPlayer ||
+                               yFirstEmptyCell > yDistanceCurrentPlayer) &&
+                               (xDistanceCurrentPlayer > Math.Abs(x * i) ||
+                               yDistanceCurrentPlayer > Math.Abs(y * i)))
                             {
                                 table[xCell, yCell] = CellState.Available;
                                 Console.WriteLine($"Available: ({xCell}, {yCell})");
