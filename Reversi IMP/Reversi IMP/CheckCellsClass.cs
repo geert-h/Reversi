@@ -22,83 +22,58 @@ namespace Reversi_IMP
             return (a, b);
         }
 
-        void CheckCells()
+        void CheckCells(int xCell, int yCell, CellState[,] board)
         {
             (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
 
-            if (table[Row, Column] == CellState.Player1 ||
-                table[Row, Column] == CellState.Player2) return;
+            if (board[xCell, yCell] == CellState.Player1 ||
+                board[xCell, yCell] == CellState.Player2) return;
 
-            foreach ((int x, int y) in CheckNeigbours(otherPlayer, Row, Column))
+            foreach ((int x, int y) in CheckNeigbours(otherPlayer, xCell, yCell, board))
             {
-                int xDistanceCurrentPlayer = 0, yDistanceCurrentPlayer = 0;
-                int xFirstEmptyCell = 0; int yFirstEmptyCell = 0;
+                (int xDistanceCurrentPlayer, int yDistanceCurrentPlayer, int xFirstEmptyCell, int yFirstEmptyCell) = DistanceCheck(xCell, yCell, x, y, currentPlayer, board);
 
-                for (int i = 1; Row + x * i >= 0 &&
-                    Row + x * i < n              &&
-                    Column + y * i >= 0          &&
-                    Column + y * i < n; i++)
-                {
-                    if (table[Row + x * i, Column + y * i] == currentPlayer)
-                    {
-                        xDistanceCurrentPlayer = Math.Abs(x * i);
-                        yDistanceCurrentPlayer = Math.Abs(y * i);
-                    }
-                    if ((table[Row + x * i, Column + y * i] == CellState.None      ||
-                        table[Row + x * i, Column + y * i] == CellState.Available) &&
-                        xFirstEmptyCell == 0                                       &&
-                        yFirstEmptyCell == 0)
-                    {
-                        xFirstEmptyCell = Math.Abs(x * i);
-                        yFirstEmptyCell = Math.Abs(y * i);
-                    }
-                }
                 if (xDistanceCurrentPlayer == 0 && yDistanceCurrentPlayer == 0) continue;
 
-                for (int i = 1; Row + x * i >= 0 &&
-                    Row + x * i < n              &&
-                    Column + y * i >= 0          &&
-                    Column + y * i < n; i++)
-                {
-                    bool firstCurrentPlayerCell = false;
-
-                    if (table[Row + x * i, Column + y * i] == currentPlayer &&
-                        (xDistanceCurrentPlayer > Math.Abs(x * i)           ||
-                        yDistanceCurrentPlayer > Math.Abs(y * i)))
-                        firstCurrentPlayerCell = true;
-
-                    if (table[Row + x * i, Column + y * i] == otherPlayer &&
-                        (xFirstEmptyCell > xDistanceCurrentPlayer         ||
-                        yFirstEmptyCell > yDistanceCurrentPlayer)         &&
-                        (xDistanceCurrentPlayer > Math.Abs(x * i)         ||
-                        yDistanceCurrentPlayer > Math.Abs(y * i)))
-                    {
-                        table[Row, Column] = currentPlayer;
-                        if (firstCurrentPlayerCell == true)
-                            break;
-                        table[Row + x * i, Column + y * i] = currentPlayer;
-                    }
-                }
-            }
-            if (table[Row, Column] == currentPlayer)
-            {
-                move++;
+                ChangeBoardStatus(xCell, yCell, x, y, xDistanceCurrentPlayer, yDistanceCurrentPlayer, xFirstEmptyCell, yFirstEmptyCell, board);
             }
 
-            for (int y = 0; y < n; y++)
-            {
-                for (int x = 0; x < n; x++)
-                {
-                    if (table[x, y] == CellState.Available)
-                        table[x, y] = CellState.None;
-                }
-            }
-            CheckPossibleCells();
-            CheckGameState();
-            nthBestMove();
+            ResetAvailableCells(xCell, yCell, board);
         }
 
-        (int x, int y)[] CheckNeigbours(CellState otherPlayer, int xPos, int yPos)
+        (int xDistanceCurrentPlayer, int yDistanceCurrentPlayer, int xFirstEmptyCell, int yFirstEmptyCell) DistanceCheck(int xCell, int yCell, int x, int y, CellState currentPlayer, CellState[,] board)
+        {
+            int xDistanceCurrentPlayer = 0, yDistanceCurrentPlayer = 0;
+            int xFirstEmptyCell = 0; int yFirstEmptyCell = 0;
+
+            for (int i = 0; xCell + x * i >= 0 &&
+                xCell + x * i < n &&
+                yCell + y * i >= 0 &&
+                yCell + y * i < n; i++)
+            {
+                if (board[xCell + x * i, yCell + y * i] == currentPlayer)
+                {
+                    xDistanceCurrentPlayer = Math.Abs(x * i);
+                    yDistanceCurrentPlayer = Math.Abs(y * i);
+                }
+                if ((board[xCell + x * i, yCell + y * i] == CellState.None ||
+                    board[xCell + x * i, yCell + y * i] == CellState.Available) &&
+                    xFirstEmptyCell == 0 &&
+                    yFirstEmptyCell == 0)
+                {
+                    xFirstEmptyCell = Math.Abs(x * i);
+                    yFirstEmptyCell = Math.Abs(y * i);
+                }
+            }
+            //Geeft een zodanig grote x en y waarde aan de eerste lege cell variabelen voor als die er niet is, ofwel als er geen lege cellen worden aangetroffen dan krijgt het toch een waarde
+            if (xFirstEmptyCell == 0 && yFirstEmptyCell == 0)
+            {
+                xFirstEmptyCell = 1000; yFirstEmptyCell = 1000;
+            }
+            return (xDistanceCurrentPlayer, yDistanceCurrentPlayer, xFirstEmptyCell, yFirstEmptyCell);
+        }
+
+        (int x, int y)[] CheckNeigbours(CellState otherPlayer, int xPos, int yPos, CellState[,] board)
         {
            List<(int x, int y)>ValidNeighbouringCells = new List<(int x, int y)>();
 
@@ -111,11 +86,55 @@ namespace Reversi_IMP
                         xPos + x >= n ||
                         yPos + y >= n)
                         continue;
-                    if (table[xPos + x, yPos + y] == otherPlayer)
+                    if (board[xPos + x, yPos + y] == otherPlayer)
                         ValidNeighbouringCells.Add((x, y));
                 }
             }
             return ValidNeighbouringCells.ToArray();
+        }
+        void ChangeBoardStatus(int xCell, int yCell, int x, int y, int xDistanceCurrentPlayer, int yDistanceCurrentPlayer, int xFirstEmptyCell, int yFirstEmptyCell, CellState[,] board)
+        {
+            (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
+
+            for (int i = 0; xCell + x * i >= 0 &&
+                    xCell + x * i < n &&
+                    yCell + y * i >= 0 &&
+                    yCell + y * i < n; i++)
+            {
+                bool firstCurrentPlayerCell = false;
+
+                if (board[xCell + x * i, yCell + y * i] == currentPlayer &&
+                    (xDistanceCurrentPlayer > Math.Abs(x * i) ||
+                    yDistanceCurrentPlayer > Math.Abs(y * i)))
+                    firstCurrentPlayerCell = true;
+
+                if (board[xCell + x * i, yCell + y * i] == otherPlayer &&
+                    (xFirstEmptyCell > xDistanceCurrentPlayer ||
+                    yFirstEmptyCell > yDistanceCurrentPlayer) &&
+                    (xDistanceCurrentPlayer > Math.Abs(x * i) ||
+                    yDistanceCurrentPlayer > Math.Abs(y * i)))
+                {
+                    {
+                        board[xCell, yCell] = currentPlayer;
+                        ValidMove = true;
+                    }
+                    
+                    if (firstCurrentPlayerCell == true)
+                        break;
+                    board[xCell + x * i, yCell + y * i] = currentPlayer;
+                }
+            }
+        }
+        void ResetAvailableCells(int xCell, int yCell, CellState[,] board)
+        {
+            for (int y = 0; y < n; y++)
+            {
+                for (int x = 0; x < n; x++)
+                {
+                    if (board[x, y] == CellState.Available)
+                        board[x, y] = CellState.None;
+                }
+            }
         }
     }
 }

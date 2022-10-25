@@ -5,54 +5,42 @@ namespace Reversi_IMP
 {
     public partial class Reversi : Form
     {
-        public void CheckPossibleCells()
+        //Gaat alle Cellen na om de Available cellen te bepalen
+        public void CheckPossibleCells(CellState[,] board)
         {
-
             (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
 
             for (int yCell = 0; yCell < n; yCell++)
             {
                 for (int xCell = 0; xCell < n; xCell++)
                 {
-                    if (table[xCell, yCell] != CellState.None) continue;
+                    //Een cel die een waarde heeft van niet None wordt overgeslagen
+                    if (board[xCell, yCell] != CellState.None)
+                        continue;
 
-                    foreach ((int x, int y) in CheckNeigbours(otherPlayer, xCell, yCell))
+                    foreach ((int x, int y) in CheckNeigbours(otherPlayer, xCell, yCell, board))
                     {
-                        int xDistanceCurrentPlayer = 0, yDistanceCurrentPlayer = 0;
-                        int xFirstEmptyCell = 0; int yFirstEmptyCell = 0;
+                        //Voor elke cel met een legale buur wordt de afstand tot de eerste cel van de huidige speler en de eerste lege cel bepaald
+                        (int xDistanceCurrentPlayer, int yDistanceCurrentPlayer, int xFirstEmptyCell, int yFirstEmptyCell) = DistanceCheck(xCell, yCell, x, y, currentPlayer, board);
 
+                        if (xDistanceCurrentPlayer == 0 &&
+                            yDistanceCurrentPlayer == 0) continue;
+
+                        //Checkt totdat een waarde niet meer in de array valt
                         for (int i = 1; xCell + x * i >= 0 &&
                             xCell + x * i < n &&
                             yCell + y * i >= 0 &&
                             yCell + y * i < n; i++)
                         {
-                            if (table[xCell + x * i, yCell + y * i] == currentPlayer)
-                            {
-                                xDistanceCurrentPlayer = Math.Abs(x * i);
-                                yDistanceCurrentPlayer = Math.Abs(y * i);
-                            }
-                            if ((table[xCell + x * i, yCell + y * i] == CellState.None ||
-                                table[xCell + x * i, yCell + y * i] == CellState.Available) &&
-                                xFirstEmptyCell == 0 &&
-                                yFirstEmptyCell == 0)
-                            {
-                                xFirstEmptyCell = Math.Abs(x * i);
-                                yFirstEmptyCell = Math.Abs(y * i);
-                            }
-                        }
-
-                        if (xDistanceCurrentPlayer == 0 && yDistanceCurrentPlayer == 0) continue;
-
-                        for (int i = 1; xCell + x * i >= 0 && xCell + x * i < n && yCell + y * i >= 0 && yCell + y * i < n; i++)
-                        {
-                            if (table[xCell + x * i, yCell + y * i] == otherPlayer && 
+                            //Als de cel van de andere speler is de afstand tot de eerste lege cel groter is dan de afstand tot de eerste cel van de huidige speler
+                            //en de afstand van de huidige speler groter is dan de afstand tot de andere speler dan is het dus een geldige zet
+                            if (board[xCell + x * i, yCell + y * i] == otherPlayer && 
                                (xFirstEmptyCell > xDistanceCurrentPlayer ||
                                yFirstEmptyCell > yDistanceCurrentPlayer) &&
                                (xDistanceCurrentPlayer > Math.Abs(x * i) ||
                                yDistanceCurrentPlayer > Math.Abs(y * i)))
                             {
-                                table[xCell, yCell] = CellState.Available;
-                                Console.WriteLine($"Available: ({xCell}, {yCell})");
+                                board[xCell, yCell] = CellState.Available;
                             }
                         }
                     }
