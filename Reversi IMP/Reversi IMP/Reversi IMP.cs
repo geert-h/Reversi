@@ -133,22 +133,31 @@ namespace Reversi_IMP
             //Initieert de check op het bord, zodra deze valide is wordt direct de cel (Rij, Kolom) gezet naar de huidige speler, vervolgens worden de corresponderende cellen gefilpped
             CheckCells(Row, Column, table);
 
+
             (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
             
             //Als Checkcells een steen op het bord plaatst en de chechbox checked is dan doet de bot zijn zet
-            if (ValidMove && AgainstBotCB.Checked)
+            if (ValidMove)
             {
                 move++;
 
                 CheckPossibleCells(table);
-                nthBestMove();
                 CheckGameState();
-                
+
+                if (!AgainstBotCB.Checked)
+                {
+                    this.Invalidate();
+                    return;
+                }
+
                 (int xOther, int yOther) = BestNextMove();
 
                 //Als er geen geldige zetten meer zijn dan stop
                 if (xOther == -1 && yOther == -1)
+                {
+                    this.Invalidate();
                     return;
+                }
 
                 CheckCells(xOther, yOther, table);
                 move++;

@@ -10,8 +10,6 @@ namespace Reversi_IMP
             (CellState currentPlayer, CellState otherPlayer) = CurrentPlayer();
 
             (int emptyCount, int availableCount, int player1Count, int player2Count) = CountCells();
-            
-            Console.WriteLine($"None:{emptyCount}, Available: {availableCount}, Player1: {player1Count}, Player2: {player2Count}");
 
             if (availableCount == 0)
             {
@@ -77,12 +75,12 @@ namespace Reversi_IMP
             }
             return (emptyCount, availableCount, player1Count, player2Count);
         }
-        int CountSpecificCells(CellState specificCellState)
+        int CountSpecificCells(CellState specificCellState, CellState[,] board)
         {
             int SpecificCellCount = 0;
             for (int i = 0; i < table.Length; i++)
             {
-                if(table[i % n, i / n] == specificCellState)
+                if(board[i % n, i / n] == specificCellState)
                 {
                     SpecificCellCount++;
                 }

@@ -10,14 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="CheckCellsClass.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CheckCellsClass.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Update="CheckCellsClass.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CheckCellsClass.Designer.cs</LastGenOutput>
