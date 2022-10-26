@@ -26,6 +26,7 @@ namespace Reversi_IMP
             List<(int xCoord, int yCoord, int cellCount)> BestCells = new List<(int xCoord, int yCoord, int CellCount)>();
             int CellCount = 0;
 
+
             //Gaat elke Available cells langs om te controleren welke cell het beste resultaat oplevert
             for (int i = 0; i < tablemirror.Length; i++)
             {
@@ -38,10 +39,12 @@ namespace Reversi_IMP
                 //Flipt de i'de available cell
                 CheckCells(xCell, yCell, tablemirror);
 
-                (int x, int y, int count) = RecursionTestCurrentPlayer(xCell, yCell, tablemirror, otherPlayer);
+                (int x, int y, int count) = RecursionTestOtherPlayer(xCell, yCell, tablemirror, otherPlayer, 0);
 
                 //Telt het aantal cellen van de huidige speler en voegt deze vervolgens toe aan de lijst van alle available cellen
                 CellCount = CountSpecificCells(currentPlayer, tablemirror);
+
+                Console.WriteLine("");
                 Console.WriteLine($"Coord:({xCell}, {yCell}), Amount: {CellCount}");
                 AvailableCells.Add((xCell, yCell, CellCount));
                 
@@ -72,13 +75,16 @@ namespace Reversi_IMP
             int index = rnd.Next(BestCells.Count);
 
             Console.WriteLine($"Gekozen als beste: ({BestCells[index].xCoord}, {BestCells[index].yCoord}), Count: {BestCells[index].cellCount}");
+            Console.WriteLine();
 
             return (BestCells[index].xCoord, BestCells[index].yCoord);
         }
 
 
-        (int x, int y, int count) RecursionTestCurrentPlayer(int xCell, int yCell, CellState[,] board, CellState currentPlayer)
-        { 
+
+        (int x, int y, int count) RecursionTestCurrentPlayer(int xCell, int yCell, CellState[,] board, CellState currentPlayer, int currentDepth)
+        {
+
             //Afkorting voor tablemirrormirror
             CellState[,] tmm = new CellState[n, n];
             tmm = (CellState[,])board.Clone();
@@ -99,6 +105,7 @@ namespace Reversi_IMP
                     continue;
 
                 CheckCells(xsCell, ysCell, board);
+
 
                 CellCount = CountSpecificCells(currentPlayer, board);
 
@@ -130,11 +137,84 @@ namespace Reversi_IMP
 
             Console.WriteLine($"({BestCells[index].x}, {BestCells[index].y}), Count: {BestCells[index].cellCount}");
 
-            return (BestCells[index].x, BestCells[index].y, BestCells[index].cellCount);
-        }
-        (int x, int y, int cellCount) RecursionTestOtherPlayer(int xCell, int yCell, CellState[,] board, CellState currentPlayer)
-        {
+            if (currentDepth == depth)
+            {
+                return (BestCells[index].x, BestCells[index].y, BestCells[index].cellCount);
+            }
+            else
+            {
+                foreach((int xsCell, int ysCell, int Count) in BestCells)
+                {
+                    currentDepth++;
+                    RecursionTestOtherPlayer(xsCell, ysCell, board, currentPlayer, currentDepth);
+                }
+            }
             return (0, 0, 0);
+        }
+
+
+        (int x, int y, int cellCount) RecursionTestOtherPlayer(int xCell, int yCell, CellState[,] board, CellState player, int currentdepth)
+        {
+            move++;
+
+            //Afkorting voor tablemirrormirror
+            CellState[,] tmm = new CellState[n, n];
+            tmm = (CellState[,])board.Clone();
+
+            List<(int x, int y, int cellCount)> AvailableCellsOther = new List<(int x, int y, int cellCount)>();
+            List<(int x, int y, int cellCount)> BestCellsOther = new List<(int x, int y, int cellCount)>();
+
+            int CellCountOther;
+
+            for (int i = 0; i < board.Length; i++)
+            {
+                CheckPossibleCells(board);
+
+                int xsCell = i % n; //omdat xCell als in gebruik is maar xsCell (vanwege diepere laag check) idem voor yCell
+                int ysCell = i / n;
+
+                if (board[xsCell, ysCell] != CellState.Available)
+                    continue;
+
+                CheckCells(xsCell, ysCell, board);
+
+                CellCountOther = CountSpecificCells(player, board);
+
+                Console.WriteLine($"sCoord:({xsCell}, {ysCell}), sAmount: {CellCountOther}");
+                AvailableCellsOther.Add((xsCell, ysCell, CellCountOther));
+
+                tmm = (CellState[,])board.Clone();
+            }
+            if (AvailableCellsOther.Count == 0)
+                return (-1,-1,-1);
+
+            int HighestCount = AvailableCellsOther.Max(x => x.cellCount);
+
+            foreach ((int xsCell, int ysCell, int Count) in AvailableCellsOther)
+            {
+                if (Count > HighestCount)
+                {
+                    BestCellsOther.Clear();
+                    BestCellsOther.Add((xsCell, ysCell, Count));
+                }
+                else if (Count == HighestCount)
+                {
+                    BestCellsOther.Add((xsCell, ysCell, Count));
+                }
+            }
+
+            //Returned een willekeurige cel die het beste is
+            int index = rnd.Next(BestCellsOther.Count);
+
+            Console.WriteLine($"({BestCellsOther[index].x}, {BestCellsOther[index].y}), Count: {BestCellsOther[index].cellCount}");
+
+            return (-1, -1, -1);
+            /*foreach((int x, int y, int Count) in BestCellsOther)
+            {
+                (int xs, int ys, int Counts) = RecursionTestCurrentPlayer(x, y, tmm, currentPlayer, currentdepth);
+                return (xs, ys, Counts);
+            }
+            return (-1, -1, -1);*/
         }
     }
 }
